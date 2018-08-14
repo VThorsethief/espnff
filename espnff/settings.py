@@ -49,7 +49,8 @@ class Settings(object):
                       20: 'BE',
                       21: 'IR',
                       22: '',
-                      23: 'RB/WR/TE'
+                      23: 'RB/WR/TE',
+                      24: ''
                       }
 
         roster = data['leaguesettings']['slotCategoryItems']

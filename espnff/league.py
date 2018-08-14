@@ -19,6 +19,7 @@ class League(object):
         self.teams = []
         self.espn_s2 = espn_s2
         self.swid = swid
+        self.athlete_pool = []
         self._fetch_league()
 
     def __repr__(self):
@@ -52,13 +53,14 @@ class League(object):
 
         self._fetch_teams(data)
         self._fetch_settings(data)
+        self.athlete_pool = self._fetch_athlete_pool()
 
     def _fetch_teams(self, data):
         '''Fetch teams in league'''
         teams = data['leaguesettings']['teams']
 
         for team in teams:
-            self.teams.append(Team(teams[team]))
+            self.teams.append(Team(teams[team], data['metadata']['leagueId'], data['metadata']['seasonId']))
 
         # replace opponentIds in schedule with team instances
         for team in self.teams:
@@ -131,3 +133,10 @@ class League(object):
                     matchup.away_team = team
 
         return result
+
+    def _fetch_athlete_pool(self):
+        pool_url = ""
+        pool_request = requests.get("http://api.espn.com/v1/sports/football/nfl/athletes")
+        pool_status = pool_request.status_code
+        return pool_request.json()
+
