@@ -3,15 +3,16 @@ ESPN Fantasy Football API
 
 | Using ESPN's Fantasy Football private API, this package interfaces
   with
-| ESPN Fantasy Football to gather data from any public league. A good
+| ESPN Fantasy Football to gather data from any public or private league. A good
   way to mine data
-| without webscraping for data manipulation projects.
+| without webscraping for data manipulation projects. Includes a dash board which visualizes your data using Dash by Plotly
 
 Getting Started
 ---------------
 
-| These instructions will get you a copy of the project up and running
-| on your local machine for development and testing purposes.
+| this application is meant to run off a web platform, but you can download the dose using these instructions to use for
+  your own purposes.
+|
 
 Installing
 ~~~~~~~~~~
@@ -42,6 +43,24 @@ Downloading a public league
 
 .. code:: python3
 
+    >>> from bin import League
+    >>> league_id = 123456
+    >>> year = 2016
+    >>> league = League(league_id, year)
+    >>> league
+    League 123456, 2016 Season
+
+
+
+    >>> from bin import League
+    >>> league_id = 123456
+    >>> year = 2016
+    >>> league = League(league_id, year)
+    >>> league
+    League 123456, 2016 Season
+
+
+
     >>> from espnff import League
     >>> league_id = 123456
     >>> year = 2016
@@ -53,6 +72,32 @@ Viewing teams in a public league
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python3
+
+    >>> from bin import League
+    >>> league_id = 123456
+    >>> year = 2016
+    >>> league = League(league_id, year)
+    >>> league.teams
+    [Team(Team 1), Team(Team 2), Team(Team 3), Team(Team 4),
+    Team(Team 5), Team(Team 6), Team(Team 7), Team(Team 8)]
+    >>> team1 = league.teams[0]
+    >>> team1
+    Team 1
+
+
+
+    >>> from bin import League
+    >>> league_id = 123456
+    >>> year = 2016
+    >>> league = League(league_id, year)
+    >>> league.teams
+    [Team(Team 1), Team(Team 2), Team(Team 3), Team(Team 4),
+    Team(Team 5), Team(Team 6), Team(Team 7), Team(Team 8)]
+    >>> team1 = league.teams[0]
+    >>> team1
+    Team 1
+
+
 
     >>> from espnff import League
     >>> league_id = 123456
@@ -107,6 +152,90 @@ Viewing league settings
 
 .. code:: python3
 
+    >>> from bin import League
+    >>> league_id = 123456
+    >>> year = 2016
+    >>> league = League(league_id, year)
+    >>> settings = league.settings
+    >>> settings
+    'Settings(League Name)'
+    >>> settings.reg_season_count
+    14
+    >>> self.final_season_count
+    16
+    >>> settings.undroppable_list
+    true
+    >>> settings.veto_votes_required
+    4
+    >>> settings.team_count
+    8
+    >>> settings.playoff_team_count
+    4
+    >>> settings.id
+    123456
+    >>> settings.keeper_count
+    3
+    >>> settings.tie_rule
+    'Most Bench Points'
+    >>> settings.playoff_seed_tie_rule
+    'Head to Head Record'
+    >>> settings.roster
+    {'RB/WR/TE': 1, 'BE': 7, 'QB': 1, 'D/ST': 1, 'RB': 2, 'TE': 1, 'K': 1, 'WR': 2}
+    >>> settings.trade_deadline
+    2016-11-16T17:00:00.000Z
+    >>> settings.name
+    League Name
+    >>> settings.status
+    playoffs
+    >>> settings.year
+    2016
+    >>> settings.server_date
+    2016-12-08T21:06:53.087Z
+
+
+
+    >>> from bin import League
+    >>> league_id = 123456
+    >>> year = 2016
+    >>> league = League(league_id, year)
+    >>> settings = league.settings
+    >>> settings
+    'Settings(League Name)'
+    >>> settings.reg_season_count
+    14
+    >>> self.final_season_count
+    16
+    >>> settings.undroppable_list
+    true
+    >>> settings.veto_votes_required
+    4
+    >>> settings.team_count
+    8
+    >>> settings.playoff_team_count
+    4
+    >>> settings.id
+    123456
+    >>> settings.keeper_count
+    3
+    >>> settings.tie_rule
+    'Most Bench Points'
+    >>> settings.playoff_seed_tie_rule
+    'Head to Head Record'
+    >>> settings.roster
+    {'RB/WR/TE': 1, 'BE': 7, 'QB': 1, 'D/ST': 1, 'RB': 2, 'TE': 1, 'K': 1, 'WR': 2}
+    >>> settings.trade_deadline
+    2016-11-16T17:00:00.000Z
+    >>> settings.name
+    League Name
+    >>> settings.status
+    playoffs
+    >>> settings.year
+    2016
+    >>> settings.server_date
+    2016-12-08T21:06:53.087Z
+
+
+
     >>> from espnff import League
     >>> league_id = 123456
     >>> year = 2016
@@ -152,6 +281,26 @@ Viewing power rankings
 
 .. code:: python3
 
+    >>> from bin import League
+    >>> league_id = 123456
+    >>> year = 2016
+    >>> league = League(league_id, year)
+    >>> league.power_rankings(week=5)
+    [('31.85', Team(Team 1)), ('25.60', Team(Team 3)), ('25.60', Team(Team 6)), ('22.45', Team(Team 2)),
+    ('20.70', Team(Team 8)), ('18.20', Team(Team 7)), ('18.20', Team(Team 4)), ('18.10', Team(Team 5))]
+
+
+
+    >>> from bin import League
+    >>> league_id = 123456
+    >>> year = 2016
+    >>> league = League(league_id, year)
+    >>> league.power_rankings(week=5)
+    [('31.85', Team(Team 1)), ('25.60', Team(Team 3)), ('25.60', Team(Team 6)), ('22.45', Team(Team 2)),
+    ('20.70', Team(Team 8)), ('18.20', Team(Team 7)), ('18.20', Team(Team 4)), ('18.10', Team(Team 5))]
+
+
+
     >>> from espnff import League
     >>> league_id = 123456
     >>> year = 2016
@@ -164,6 +313,60 @@ Viewing scoreboard
 ~~~~~~~~~~~~~~~~~~
 
 .. code:: python3
+
+    >>> from bin import League
+    >>> league_id = 123456
+    >>> year = 2016
+    >>> league = League(league_id, year)
+    >>> league.scoreboard() # grab current week
+    ["Matchup(Team(Team 2), Team(Team 7))", "Matchup(Team(Team 1), Team(Team 11))",
+    "Matchup(Team(Team 6), Team(Team 9))", "Matchup(Team(Team 12), Team(Team 4))",
+    "Matchup(Team(Team 10), Team(Team 3))", "Matchup(Team(Team 8), Team(Team 5))"]
+    >>> scoreboard = league.scoreboard(week=12) # define week
+    >>> scoreboard
+    ["Matchup(Team(Team 2), Team(Team 7))", "Matchup(Team(Team 1), Team(Team 11))",
+    "Matchup(Team(Team 6), Team(Team 9))", "Matchup(Team(Team 12), Team(Team 4))",
+    "Matchup(Team(Team 10), Team(Team 3))", "Matchup(Team(Team 8), Team(Team 5))"]
+    >>> matchup = scoreboard[1]
+    >>> matchup
+    "Matchup(Team(Team 1), Team(Team 11))"
+    >>> matchup.home_team
+    "Team(Team 1)"
+    >>> matchup.home_score
+    7.05
+    >>> matchup.away_team
+    "Team(Team 11)"
+    >>> matchup.away_score
+    45.85
+
+
+
+    >>> from bin import League
+    >>> league_id = 123456
+    >>> year = 2016
+    >>> league = League(league_id, year)
+    >>> league.scoreboard() # grab current week
+    ["Matchup(Team(Team 2), Team(Team 7))", "Matchup(Team(Team 1), Team(Team 11))",
+    "Matchup(Team(Team 6), Team(Team 9))", "Matchup(Team(Team 12), Team(Team 4))",
+    "Matchup(Team(Team 10), Team(Team 3))", "Matchup(Team(Team 8), Team(Team 5))"]
+    >>> scoreboard = league.scoreboard(week=12) # define week
+    >>> scoreboard
+    ["Matchup(Team(Team 2), Team(Team 7))", "Matchup(Team(Team 1), Team(Team 11))",
+    "Matchup(Team(Team 6), Team(Team 9))", "Matchup(Team(Team 12), Team(Team 4))",
+    "Matchup(Team(Team 10), Team(Team 3))", "Matchup(Team(Team 8), Team(Team 5))"]
+    >>> matchup = scoreboard[1]
+    >>> matchup
+    "Matchup(Team(Team 1), Team(Team 11))"
+    >>> matchup.home_team
+    "Team(Team 1)"
+    >>> matchup.home_score
+    7.05
+    >>> matchup.away_team
+    "Team(Team 11)"
+    >>> matchup.away_score
+    45.85
+
+
 
     >>> from espnff import League
     >>> league_id = 123456

@@ -11,4 +11,4 @@ install:
 
 script: 
   - python3 setup.py test
-  - flake8 espnff
+  - flake8 bin

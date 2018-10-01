@@ -1,7 +1,7 @@
 import unittest
 
 
-from espnff.utils import (
+from bin.utils import (
     square_matrix,
     add_matrix,
     two_step_dominance)

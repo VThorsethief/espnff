@@ -2,14 +2,12 @@
 
 # ESPN Fantasy Football API
 
-Using ESPN's Fantasy Football private API, this package interfaces with 
-ESPN Fantasy Football to gather data from any public league. A good way to mine data
-without webscraping for data manipulation projects.
+Using the Espn API in combination with the NFL V1 API, this program gathers data from your fantasy football league,
+both private and public. You can then visualize data using Dash by Plotly.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running 
-on your local machine for development and testing purposes.
+The application can run from a web platform without downloading Python, but you can also use it for development purposes.
 
 ### Installing
 With pip:

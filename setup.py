@@ -1,27 +1,27 @@
 from setuptools import setup
 
 setup(
-    name='espnff',
+    name='fantasyAnalyst',
 
-    packages=['espnff'],
+    packages=['fantasyAnalyst'],
 
     include_package_data=True,
 
-    version='1.3.1',
+    version='1.0.0',
 
-    description='ESPN fantasy football API',
+    description='Dashboard Application for Visualizing League Data using Dash by Plotly',
 
-    author='Rich Barton',
+    author='Connor Klopfer',
 
-    author_email='rbart65@gmail.com',
+    author_email='cklopfer10@aol.com',
 
-    install_requires=['requests>=2.0.0,<3.0.0'],
+    install_requires=['requests>=2.0.0,<3.0.0', 'dash', ],
 
     test_suite='nose.collector',
 
     tests_require=['nose', 'requests_mock'],
 
-    url='https://github.com/rbarton65/espnff',
+    url='https://github.com/rbarton65/bin',
 
     classifiers=[
         'Natural Language :: English',

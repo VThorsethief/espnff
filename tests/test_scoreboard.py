@@ -3,10 +3,10 @@ import unittest
 import json
 
 
-from espnff.league import (League)
-from espnff.exception import (PrivateLeagueException,
-                              InvalidLeagueException,
-                              UnknownLeagueException, )
+from bin.league import (League)
+from bin.exception import (PrivateLeagueException,
+                           InvalidLeagueException,
+                           UnknownLeagueException, )
 
 
 class ScoreboardTestCase(unittest.TestCase):

@@ -1,6 +1,6 @@
 class Settings(object):
     '''Creates Settings object'''
-    def __init__(self, data):
+    def __init__(self, data, newRecord):
         self.reg_season_count = data['leaguesettings']['finalRegularSeasonMatchupPeriodId']
         self.undroppable_list = data['leaguesettings']['usingUndroppableList']
         self.veto_votes_required = data['leaguesettings']['vetoVotesRequired']
@@ -16,7 +16,8 @@ class Settings(object):
         self.name = data['leaguesettings']['name']
         self.status = data['metadata']['status']
         self.year = data['metadata']['seasonId']
-        self.server_date = data['metadata']['serverDate']
+        if newRecord:
+            self.server_date = data['metadata']['serverDate']
         self._fetch_roster_settings(data)
         self._fetch_tie_rules(data)
 
@@ -55,7 +56,7 @@ class Settings(object):
 
         roster = data['leaguesettings']['slotCategoryItems']
         self.roster = {roster_map[i['slotCategoryId']]: i['num'] for i in roster
-                       if i['num'] != 0}
+                       if int(i['num']) != 0}
 
     def _fetch_tie_rules(self, data):
         '''Grabs matchup and playoff seeding tie info'''
