@@ -9,7 +9,7 @@ from .exception import (PrivateLeagueException,
                         InvalidLeagueException,
                         UnknownLeagueException, )
 import urllib.request as urllib2
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 from .leader import (OffensiveLeader, KickerLeader, DefensiveLeader)
 import datetime
 from bin import fileWriter as fw
@@ -19,7 +19,7 @@ import os
 
 
 class League(object):
-    '''Creates a League instance for Public or Private ESPN league'''
+    #Generates a league instance using the year and cookies SWID and espn2 from the user's browser
     def __init__(self, year, espn_s2=None, swid=None, new_request = None):
         # self.league_id = league_id
         self.year = year
@@ -38,24 +38,25 @@ class League(object):
     def __repr__(self):
         return 'League(%s, %s)' % (self.league_id, self.year, )
 
-    # Method for obtaining the leage data through a json request or reading it from file.
+    # Method for obtaining the league data through a json request or reading it from file.
     # -Checks to see if the date written at the top of the record matches today's date. If the date is different from
     # today, then makes a new json request. If the date is the same as today, then the league data is taken from a text
     # file.
     def _fetch_league(self):
-        # Sets the new Record value thats used throughout the league object
+        # Sets the new Record value thats used throughout the league object. The idea is that if a request was already
+        # made to ESPN, then the program will read the data from file rather than make a new request. This is
+        # Particularly useful during debuging to prevent multiple requests and getting your IP locked. Can be overwritten
+        # by passing an argument to the League Constructor
         if (self._get_date_from_file("tests", "testRecord") == str(datetime.date.today())) or not self.new_request:
             self.new_record = False
-            print("read from record")
         else:
             self.new_record = True
-
-        # self.newRecord = True
         params = {
-            # 'leagueId': self.league_id,
+            # 'leagueId': self.league_id,  #this value can be added in if the browser cookies are no longer needed.
             'seasonId': self.year
         }
         cookies = None
+        # If cookies are given, uses them to sign into a private league.
         if self.espn_s2 and self.swid:
             cookies = {
                 'espn_s2': self.espn_s2,
@@ -78,13 +79,14 @@ class League(object):
         self._fetch_settings(data)
         # self.leaders = self._fetch_leader_pool()    # This line was ommitted, there might be some use for the leader
         # pool in the future, but for now finding the "pooled player" leaders will suffice
-        self.pooledPlayers = self.fetch_pooled_players(2018, "weekStats", self.current_week)
+        self.pooledPlayers = self.fetch_pooled_players(self.year, "weekStats", self.current_week)
+
 
 
 
     # Fetches the teams for the league. Reads through the data and for every team entry will create a new Team object
     def _fetch_teams(self, data):
-        '''Fetch teams in league'''
+        # Fetch teams in a league and uses that to find the current week in the season
         if self.new_record:
             teams = data['leaguesettings']['teams']
         else:
@@ -109,6 +111,7 @@ class League(object):
         # sort by team ID
         self.teams = sorted(self.teams, key=lambda x: x.team_id, reverse=False)
 
+        # Gets the current week for making a request through the NFL API
         self.current_week = self.get_current_week()
 
     # Sets the current week for making NFL API requests, uses the scores from the first team in the league to find the
@@ -147,7 +150,7 @@ class League(object):
         power_rank = power_points(dominance_matrix, teams_sorted, week)
         return power_rank
 
-    # For finding the
+
     def scoreboard(self, week=None):
         '''Returns list of matchups for a given week'''
         params = {
@@ -182,6 +185,8 @@ class League(object):
 
         return result
 
+    #This method retreives the "Leaders" outlined in the table on espn.com leaderboard. Reteives the information by
+    # webscraping.
     def _fetch_leader_pool(self):
         leaders = []
         if self.new_record:
@@ -208,44 +213,53 @@ class League(object):
             leaders = fw.get_leaders_from_file(self.new_record)
         return leaders
 
+    # Retrieves the date of the file was written. Looks at the first line of the document,parses out the date and
+    # returns it.
     def _get_date_from_file(self, file_path, file_name):
         try:
             file = open(file_path + "\\" + file_name + ".txt")
-        except FileNotFoundError:
-            file = open(os.path.dirname(os.getcwd()) + "\\" + file_path + "\\" + file_name + ".txt", "r")
-        finally:
             first_line = file.readline().rstrip()
             date = str(first_line.split(" ")[0])
             file.close()
+        except FileNotFoundError:
+            file = open(os.path.dirname(os.getcwd()) + "\\" + file_path + "\\" + file_name + ".txt", "r")
+            first_line = file.readline().rstrip()
+            date = str(first_line.split(" ")[0])
+            file.close()
+        finally:
+
             return date
 
-
+    # Uses the NFL API to retrieve player data for the given year. can retrieve either season stats or weekstats. If
+    # using weekstats, can specify the week, defaults to 1.
     def fetch_pooled_players(self, year, statType, week):
         formatter = jsonFormat.generate_dict()
         names_array = []
+        # Generates an array of all the names in the fantasy league
         for y in range(len(self.teams)):
             names_array.append([])
             for x in range(len(self.teams[y].roster)):
                 names_array[y].append(self.teams[y].roster[x].firstName.lower() + " " + self.teams[y].roster[x].lastName.lower())
+        # Makes a request if there's a "new record"
         if self.new_record:
             url = "http://api.fantasy.nfl.com/v1/players/stats?statType=" + statType +"&week=" + str(week) + "&season=" + str(year) + "&format=json"
             data = requests.get(url)
             week_requests = []
             week_num = 1
-            print('making requests')
+            # Makes multiple requests to generate the scores each week for the players
             while week_num <= week:
                 temp_url = "http://api.fantasy.nfl.com/v1/players/stats?statType=" + statType +"&week=" + str(week_num) + "&season=" + str(year) + "&format=json"
                 temp_request = requests.get(temp_url)
                 week_requests.append(temp_request.json()['players'])
                 week_num +=1
-            print('merging request')
             merged_week_points = self.merge_week_points(week_requests)
-            print('done mergin requests')
+            # To notify if theres an error in the request
             if data.reason != "OK":
                 print(data.reason)
             data = data.json()
             players = data['players']
-            for player in players:  # Continue Here 10Sep18
+            # Attaches the week scores to players in the league
+            for player in players:
                 for stat in formatter:
                     if player["stats"].get(str(stat), "Entry Not Found") != "Entry Not Found":
                         player[formatter[stat]["abbr"]] = player["stats"][str(stat)]
@@ -262,7 +276,7 @@ class League(object):
                         self.teams[x].roster[finder].set_scores(player['weekScores'])
                     except ValueError:
                         continue
-
+        # For reading the pooled data from file.
         else:
             players = fw.get_nflPlayers_from_file()
             for player in players:
@@ -274,6 +288,7 @@ class League(object):
                         continue
         final_player_list = []
         index = 0
+        # Ties the NFL reference to the fantasy player.
         for player in players:
             final_player_list.append(nflPlayer.NFLPlayer(player))
             for x in range(len(names_array)):
@@ -286,6 +301,8 @@ class League(object):
 
         return final_player_list
 
+    # Merges the scores for subsequent weeks to generate a vector of scores for each player, with each item being that
+    # weeks scores.
     def merge_week_points(self, requests):
         merged = {}
         for i in range(len(requests)):
@@ -298,22 +315,23 @@ class League(object):
                 except KeyError:
                     merged[k['name']] = [k['weekPts']]
                     continue
-
         return merged
 
-
+# Returns a list of the team owners
     def get_owners(self):
         owners = []
         for team in self.teams:
             owners.append(team.owner)
         return owners
 
+# generates a list of the teams "offensive power" within the league.
     def get_offensive_power(self):
         power = []
         for team in self.teams:
             power.append(team.offensivePower)
         return power
 
+# generates a list of defensive power within the league.
     def get_defensive_power(self):
         power = []
         for team in self.teams:

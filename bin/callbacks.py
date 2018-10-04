@@ -4,6 +4,7 @@ from .data import myLeague, board
 
 app.layout = board.main_page
 
+# Changing the value of the selection for the main drop down menu.
 @app.callback(
     Output(component_id='leagueDash', component_property='style'),
     [Input(component_id = 'dashSelector', component_property = 'value')]
@@ -12,6 +13,7 @@ def update_league_summary(input_value):
     if input_value != "League Summary":
         return {'display': 'none'}
 
+#
 @app.callback(
     Output(component_id='teamDash', component_property='style'),
     [Input(component_id = 'dashSelector', component_property = 'value')]
