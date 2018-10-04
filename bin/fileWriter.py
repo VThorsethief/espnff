@@ -9,7 +9,7 @@ def writeToFile(league, filePath, fileName):
     try:
         file = open(filePath + "\\" + fileName + ".txt", "w")
     except FileNotFoundError:
-        file = open(os.path.dirname(os.getcwd()) + "\\" + "tests" + "\\" + "testRecord.txt", "w")
+        file = open(os.path.dirname(os.getcwd()) + "\\" + "tests" + "\\" + "offlineRecordofflineRecord.txt", "w")
     file.write(str(datetime.datetime.today()))
     file.write(str(league.league_id) + "\n")
     file.write(str(league.year) + "\n")
@@ -255,14 +255,14 @@ def convert_list_to_string(target_list):
 
 def read_record_from_file():
     try:
-        file = open(r"tests\testRecord.txt", "r")
+        file = open(r"tests\offlineRecord.txt", "r")
         lines = file.readlines()
         for i in range(len(lines)):
             lines[i] = lines[i].rstrip("\n")
         file.close()
         return lines
     except FileNotFoundError:
-        file = open(os.path.dirname(os.getcwd()) + "\\" + "tests" + "\\" + "testRecord.txt", "r")
+        file = open(os.path.dirname(os.getcwd()) + "\\" + "tests" + "\\" + "offlineRecordofflineRecord.txt", "r")
         lines = file.readlines()
         for i in range(len(lines)):
             lines[i] = lines[i].rstrip("\n")

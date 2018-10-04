@@ -25,3 +25,4 @@ instance/
 .webassets-cache
 target/
 .env
+offlineRecord.txt

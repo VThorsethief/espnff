@@ -32,7 +32,7 @@ class League(object):
 
         self._fetch_league()
         if self.new_record:
-            fw.writeToFile(self, "tests", "testRecord")
+            fw.writeToFile(self, "tests", "offlineRecord")
 
 
     def __repr__(self):

@@ -1,21 +1,22 @@
 from setuptools import setup
 
 setup(
-    name='fantasyAnalyst',
+    name='espnff',
 
-    packages=['fantasyAnalyst'],
+    packages=['espnff'],
 
     include_package_data=True,
 
-    version='1.0.0',
+    version='1.4.0',
 
     description='Dashboard Application for Visualizing League Data using Dash by Plotly',
 
-    author='Connor Klopfer',
+    author='Rich Barton, Connor Klopfer',
 
-    author_email='cklopfer10@aol.com',
+    author_email='rbart65@gmail.com, cklopfer10@aol.com',
 
-    install_requires=['requests>=2.0.0,<3.0.0', 'dash', ],
+    install_requires=['requests>=2.0.0,<3.0.0', 'dash', 'dash-core-components', 'dash-html-components',
+                      'browser-cookie3'],
 
     test_suite='nose.collector',
 
