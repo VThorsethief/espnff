@@ -9,7 +9,7 @@ def writeToFile(league, filePath, fileName):
     try:
         file = open(filePath + "\\" + fileName + ".txt", "w")
     except FileNotFoundError:
-        file = open(os.path.dirname(os.getcwd()) + "\\" + "tests" + "\\" + "offlineRecordofflineRecord.txt", "w")
+        file = open(os.path.dirname(os.getcwd()) + "\\" + "tests" + "\\" + "offlineRecord.txt", "w")
     file.write(str(datetime.datetime.today()))
     file.write(str(league.league_id) + "\n")
     file.write(str(league.year) + "\n")
@@ -262,7 +262,7 @@ def read_record_from_file():
         file.close()
         return lines
     except FileNotFoundError:
-        file = open(os.path.dirname(os.getcwd()) + "\\" + "tests" + "\\" + "offlineRecordofflineRecord.txt", "r")
+        file = open(os.path.dirname(os.getcwd()) + "\\" + "tests" + "\\" + "offlineRecord.txt", "r")
         lines = file.readlines()
         for i in range(len(lines)):
             lines[i] = lines[i].rstrip("\n")
