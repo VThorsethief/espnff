@@ -47,12 +47,12 @@ class League(object):
         # made to ESPN, then the program will read the data from file rather than make a new request. This is
         # Particularly useful during debuging to prevent multiple requests and getting your IP locked. Can be overwritten
         # by passing an argument to the League Constructor
-        if (self._get_date_from_file("tests", "testRecord") == str(datetime.date.today())) or not self.new_request:
+        if (self._get_date_from_file("tests", "offlineRecord") == str(datetime.date.today())) or (self.new_request is True):
             self.new_record = False
         else:
             self.new_record = True
         params = {
-            # 'leagueId': self.league_id,  #this value can be added in if the browser cookies are no longer needed.
+            'leagueId': self.league_id,  #this value can be added in if the browser cookies are no longer needed.
             'seasonId': self.year
         }
         cookies = None
@@ -222,10 +222,14 @@ class League(object):
             date = str(first_line.split(" ")[0])
             file.close()
         except FileNotFoundError:
-            file = open(os.path.dirname(os.getcwd()) + "\\" + file_path + "\\" + file_name + ".txt", "r")
-            first_line = file.readline().rstrip()
-            date = str(first_line.split(" ")[0])
-            file.close()
+            try:
+                file = open(os.path.dirname(os.getcwd()) + "\\" + file_path + "\\" + file_name + ".txt", "r")
+                first_line = file.readline().rstrip()
+                date = str(first_line.split(" ")[0])
+                file.close()
+            except FileNotFoundError:
+                date = ""
+
         finally:
 
             return date
