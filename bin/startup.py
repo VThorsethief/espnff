@@ -17,8 +17,10 @@ index = html.Div(
                     type = 'text'
                 ),
                 html.Button('Submit',
-                           id = 'submitButton')
-            ]
+                           id = 'submitButton',
+                            className='button button-primary')
+            ],
+            style={'margin-left':'auto'}
         )
     ])
 app.layout = index
