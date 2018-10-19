@@ -342,3 +342,5 @@ class DashBoard(object):
         if new_setting != self.current_setting:
             print("new selection")
             self.current_setting = new_setting
+
+

@@ -1,4 +1,4 @@
-from bin.application import app
+from bin.startup import app
 # Runs the application and attaches the stylesheet.
 
 server = app.server

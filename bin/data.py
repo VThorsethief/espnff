@@ -1,4 +1,3 @@
-from bin import (league, graphs)
 import browser_cookie3 as bc
 import datetime
 from flask import request
@@ -10,6 +9,6 @@ except KeyError:
     swid = request.cookies.get('SWID')
     espn2 = request.cookies.get('espn_s2')
 year = datetime.datetime.today().year
-myLeague = league.League(year,espn_s2=espn2,swid=swid)
-
-board = graphs.DashBoard(myLeague)
+# myLeague = league.League(year,espn_s2=espn2,swid=swid)
+# myLeague = None
+# board = graphs.DashBoard(myLeague)

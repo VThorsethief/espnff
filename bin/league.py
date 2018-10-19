@@ -20,8 +20,8 @@ import os
 
 class League(object):
     #Generates a league instance using the year and cookies SWID and espn2 from the user's browser
-    def __init__(self, year, espn_s2=None, swid=None, new_request = None):
-        # self.league_id = league_id
+    def __init__(self, league_id, year, espn_s2=None, swid=None, new_request = None, online = None):
+        self.league_id = league_id
         self.year = year
         self.ENDPOINT = "http://games.espn.com/ffl/api/v2/"
         self.teams = []
@@ -31,7 +31,7 @@ class League(object):
         self.max_stats = {}
 
         self._fetch_league()
-        if self.new_record:
+        if self.new_record and not online:
             fw.writeToFile(self, "tests", "offlineRecord")
 
 

@@ -1,8 +1,15 @@
 from dash.dependencies import (Input, Output)
+# from .instance import app
+# from .data import myLeague, board
+#
+# app.layout = board.main_page
 from .instance import app
-from .data import myLeague, board
+from .startup import (myLeague, board)
 
-app.layout = board.main_page
+
+## !!!!!  This is where the signin happens, we need to have functioality to import the league and the board
+## upon instance of the callback, and returs the board main page when the league is built and the board is generated.
+## The sign in will be the original layout.
 
 # Changing the value of the selection for the main drop down menu.
 @app.callback(
