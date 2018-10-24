@@ -1,10 +1,12 @@
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
+import json
 
 class DashBoard(object):
     def __init__(self, league):
         self.league = league
+        self.team_layouts = {}
         self.week_list = self.generate_week_list()
         self.radar_list, self.scatter_lines, self.team_names, self.drop_down_options,\
             self.index_list = self.generate_team_lists()
@@ -15,24 +17,28 @@ class DashBoard(object):
         self.league_bubble = self.generate_league_bubble()
         self.league_page = self.generate_league_page()
         # self.league_bubble_title = self.generate_league_bubble_title
-        self.team_layout = self.generate_team_layout(0)
         self.current_setting = "League Summary"
         self.main_page = self.generate_main_page()
 
+    # These are week labels for each week in the regular season, does not include the post-season
     def generate_week_list(self):
         week_list = []
         for w in range(13):
             week_list.append("Week " + str(w + 1))
         return week_list
 
+    # This method generates the team info for the leagues, its more broad info like team names and owners, not specific
+    # info like players.
     def generate_team_lists(self):
         radar_list = []
         scatter_lines = []
-        team_layout_list = []
         team_names = []
         index_list = []
+        # Initial drop down options for the layout input. These are the options that are general across the league,
+        # not the individual teams
         drop_down_options = [{'label': "League Summary", 'value' : 'League Summary'},
         {'label' : "League Bubble", 'value' : 'League Bubble'}]
+        # Populates the scatter lines, team names, and drop down options
         for team in self.league.teams:
             radar_list.append(go.Scatterpolar(
                 r=[team.passing_power, team.rushing_power,
@@ -56,8 +62,10 @@ class DashBoard(object):
             }
             drop_down_options.append(temp)
             index_list.append(team.owner)
+        self.build_team_layouts()
         return radar_list, scatter_lines, team_names, drop_down_options, index_list
 
+    # This organizes the data for the pooled players across the entire NFL League, not by fantasy team.
     def generate_pooled_player_lists(self):
         pooled_season_pts = []
         pooled_week_points = []
@@ -73,6 +81,7 @@ class DashBoard(object):
         return pooled_season_pts, pooled_week_points, \
                pooled_proj_week_pts, pooled_names, pooled_position
 
+    # Builds the actual structure for the drop down list using the dash framework.
     def generate_drop_down_list(self):
         return html.Div(
             dcc.Dropdown(
@@ -85,6 +94,7 @@ class DashBoard(object):
             className= "five columns"
         )
 
+    # Changes the selected value for the drop down list.
     def change_drop_down_list(self, input_value):
         drop_down = html.Div(
             dcc.Dropdown(
@@ -200,7 +210,7 @@ class DashBoard(object):
 
     def generate_main_page(self):
         main =  html.Div(
-            id = 'main',
+            id = 'mainBuilt',
             children=[
                 html.Div(
                     id = 'header',
@@ -210,7 +220,6 @@ class DashBoard(object):
                             children="Fantasy Analyst: " + self.league.settings.name,
                             className='seven columns'
                         ),
-
                         self.drop_down_struct
                     ]
                 ),
@@ -220,111 +229,15 @@ class DashBoard(object):
                     children=[
                         self.league_page,
                         # self.league_bubble,
-                        self.team_layout
+                        # self.team_layout
                     ]
-                )
-
+                ),
+                html.P(id = "teamData", children=self.team_layouts, style={'display': 'none'})
                 ]
 
         )
         return main
-    def generate_team_layout(self, i):
-        player_scatter = []
-        player_total_points = []
-        player_week_points = []
-        player_percent_started = []
-        player_percent_owned = []
-        player_names = []
-        player_position = []
-        for player in self.league.teams[i].roster:
-            player_scatter.append(
-                go.Scatter(
-                    x=self.week_list,
-                    y=player.scores,
-                    name=player.__repr__(),
-                    mode='lines+markers'
-                )
-            )
-            try:
-                player_total_points.append(player.totalPoints)
-                player_percent_started.append(player.percentStarted)
-                player_percent_owned.append(player.percentOwned)
-                player_names.append(player.firstName + " " + player.lastName)
-                player_position.append(player.getPosition())
-                player_week_points.append(player.NFLreference.weekPts)
-            except AttributeError:
-                player_week_points.append(0)
-                continue
 
-        team_layout = html.Div(
-            id="teamDash",
-            children=[
-                html.H1(id = 'teamHeader',
-                        children=self.league.teams[i].owner,
-                        className="twelve columns"),
-                html.Div(
-                    children=[
-                        html.Div(dcc.Graph(
-                            id="teamLine",
-                            figure=go.Figure(
-                                data=player_scatter,
-                                layout=go.Layout(
-                                    title="Player Score Progress over time",
-                                    yaxis=dict(title="Team Scores")
-                                )
-                            )
-                        )),
-                        html.Div(dcc.Graph(
-                            id="teamBar",
-                            figure=go.Figure(
-                                data=[
-                                    {'x': ["Offensive Power", 'Defensive Power', 'Kicking power'],
-                                     'y': [self.league.teams[i].offensivePower, self.league.teams[i].defensivePower,
-                                           self.league.teams[i].kicking_power],
-                                     'type': 'bar',
-                                     'name': self.league.teams[i].owner}
-                                ],
-                                layout = go.Layout(
-                                    title = "Relative Team Strengths"
-                                )
-                            )
-                        ))], className='four columns'),
-                html.Div(
-                    children=[
-                        dcc.Graph(
-                            id="teamScatter",
-                            figure=go.Figure(
-                                data=[go.Scatter3d(
-                                    x=player_position,
-                                    y=player_total_points,
-                                    z=player_week_points,
-                                    text=player_names,
-                                    mode="markers",
-
-                                    marker=dict(
-                                        sizemode='diameter',
-                                        sizeref=2,
-                                        size=player_percent_owned,
-                                        color=player_percent_started,
-                                        colorscale='Viridis',
-                                        colorbar=dict(title='Percent<br>Started')),
-
-                                )],
-                                layout=go.Layout(
-                                    height=1000,
-                                    width=1000,
-                                    title=self.league.teams[i].owner
-                                )
-                            )
-                        )
-                    ],
-                    className="four columns"
-
-                )
-
-            ]
-        )
-        return team_layout
 
 
     def update_dash_board(self, input_value):
@@ -342,5 +255,142 @@ class DashBoard(object):
         if new_setting != self.current_setting:
             print("new selection")
             self.current_setting = new_setting
+
+    def build_team_layouts(self):
+        for team in self.league.teams:
+            temp = TeamBoard(team, self.week_list)
+            self.team_layouts[team.owner] = json.dumps(temp.generate_team_list())
+        self.team_layouts = json.dumps(self.team_layouts)
+
+# The individual team Layout per team. This stores the data specific to the teams. Allows for better organization
+class TeamBoard(object):
+    def __init__(self, team, weeks):
+        self.team = team
+        self.player_scatter = []
+        self.player_total_points = []
+        self.player_week_points = []
+        self.player_percent_started = []
+        self.player_percent_owned = []
+        self.player_names = []
+        self.player_position = []
+        self.weeks = weeks
+        self.player_scatter_dict = {}
+        for player in team.roster:
+            self.player_scatter.append(
+                go.Scatter(
+                    x = weeks,
+                    y = player.scores,
+                    name = player.__repr__(),
+                    mode = 'lines+markers'
+                ))
+            self.player_scatter_dict[player.__repr__()] = dict(
+                x = weeks,
+                y = player.scores,
+                name = player.__repr__(),
+                mode = 'lines+markers'
+
+            )
+            try:
+                self.player_total_points.append(player.totalPoints)
+                self.player_percent_started.append(player.percentStarted)
+                self.player_percent_owned.append(player.percentOwned)
+                self.player_names.append(player.firstName + " " + player.lastName)
+                self.player_position.append(player.getPosition())
+                self.player_week_points.append(player.NFLreference.weekPts)
+            except AttributeError:
+                self.player_week_points.append(0)
+                continue
+        self.team_layout = None
+        # self.generate_team_layout()
+
+    def generate_team_list(self):
+        temp = dict(
+            week_labels = self.weeks,
+            player_total_points = self.player_total_points,
+            player_week_points = self.player_week_points,
+            player_percent_started = self.player_percent_started,
+            player_percent_owned = self.player_percent_owned,
+            player_names = self.player_names,
+            player_position = self.player_position,
+            player_scatter = self.player_scatter_dict,
+            owner = self.team.owner
+        )
+        return temp
+
+    # This generates the individual team layout and serializes the layout in json to the layout can be build later.
+    def generate_team_layout(self):
+        self.team_layout = html.Div(
+            id = self.team.__repr__(),
+            children = [
+                html.H1(
+                    id = 'teamHeader',
+                    children = self.team.owner,
+                    className = 'twelve columns'
+                ),
+                html.Div(
+                    children=[
+                        html.Div(dcc.Graph(
+                            id="teamLine",
+                            figure=go.Figure(
+                                data =self.player_scatter,
+                                layout=go.Layout(
+                                    title="Player Score Progress over time",
+                                    yaxis=dict(title="Team Scores")
+                                )
+                            )
+                        )),
+                        html.Div(dcc.Graph(
+                            id="teamBar",
+                            figure=go.Figure(
+                                data=[
+                                    {'x': ["Offensive Power", 'Defensive Power', 'Kicking power'],
+                                     'y': [self.team.offensivePower, self.team.defensivePower,
+                                           self.team.kicking_power],
+                                     'type': 'bar',
+                                     'name': self.team.owner}
+                                ],
+                                layout=go.Layout(
+                                    title="Relative Team Strengths"
+                                )
+                            )
+                        ))], className='four columns'),
+                html.Div(
+                    children=[
+                        dcc.Graph(
+                            id = "teamScatter",
+                            figure = go.Figure(
+                                data = [go.Scatter3d(
+                                    x = self.player_position,
+                                    y=self.player_total_points,
+                                    z=self.player_week_points,
+                                    text=self.player_names,
+                                    mode="markers",
+
+                                    marker=dict(
+                                        sizemode='diameter',
+                                        sizeref=2,
+                                        size=self.player_percent_owned,
+                                        color=self.player_percent_started,
+                                        colorscale='Viridis',
+                                        colorbar=dict(title='Percent<br>Started')),
+
+                                )],
+                                layout=go.Layout(
+                                    height=1000,
+                                    width=1000,
+                                    title=self.team.owner
+                                )
+                            )
+                        )
+                    ],
+                    className="four columns"
+
+                )
+
+
+            ]
+        )
+        self.team_layout = json.dumps(self.team_layout)
+
 
 
