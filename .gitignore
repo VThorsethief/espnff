@@ -26,3 +26,4 @@ instance/
 target/
 .env
 offlineRecord.txt
+.idea/
