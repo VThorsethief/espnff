@@ -10,6 +10,7 @@ import json
 index = html.Div(
     id = 'main',
     children = [
+        html.H1('Trade Dash'),
         html.Div(
             id = 'signIn',
             children=[
@@ -22,9 +23,17 @@ index = html.Div(
                            id = 'submitButton',
                             className='button button-primary')
             ],
-            style={'margin-left':'auto'}
+            style={'margin': 'auto',
+                   'display': 'flex',
+                   'flex-direction': 'column',
+                   'width': '250px',
+                   'height': '200px',
+                   'margin-top': '200px',
+                   'justify-content': 'space-between'}
         )
-    ])
+    ],
+    style={'margin': 'auto', 'max-width': '1800px'})
+
 app.layout = index
 
 from . import callbacks
@@ -37,7 +46,7 @@ from . import callbacks
 def buildLeague(n_clicks, value):
     print(value)
     if value is not None and n_clicks > 0:
-        myLeague = league.League(year= year,league_id=value, espn_s2=espn2,swid=swid)
+        myLeague = league.League(year= year,league_id=value, espn_s2=espn2,swid=swid, online = True)
         board = graphs.DashBoard(myLeague)
         print("built")
         return board.main_page
@@ -46,14 +55,23 @@ def buildLeague(n_clicks, value):
         return html.Div(
             id = 'signIn',
             children=[
+                html.H1('Trade Dash'),
                 dcc.Input(
                     id='idInput',
                     placeholder="Enter League Id Here...",
                     type = 'text'
                 ),
                 html.Button('Submit',
-                           id = 'submitButton')
-            ]
+                           id = 'submitButton',
+                            className='button button-primary')
+            ],
+            style={'margin': 'auto',
+                   'display': 'flex',
+                   'flex-direction': 'column',
+                   'width': '250px',
+                   'height': '200px',
+                   'margin-top': '200px',
+                   'justify-content': 'space-between'}
         )
 
 

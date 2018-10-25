@@ -18,6 +18,7 @@ class DashBoard(object):
         self.league_page = self.generate_league_page()
         # self.league_bubble_title = self.generate_league_bubble_title
         self.current_setting = "League Summary"
+        self.team_layout = self.generate_team_page()
         self.main_page = self.generate_main_page()
 
     # These are week labels for each week in the regular season, does not include the post-season
@@ -229,7 +230,7 @@ class DashBoard(object):
                     children=[
                         self.league_page,
                         # self.league_bubble,
-                        # self.team_layout
+                        self.team_layout
                     ]
                 ),
                 html.P(id = "teamData", children=self.team_layouts, style={'display': 'none'})
@@ -261,6 +262,9 @@ class DashBoard(object):
             temp = TeamBoard(team, self.week_list)
             self.team_layouts[team.owner] = json.dumps(temp.generate_team_list())
         self.team_layouts = json.dumps(self.team_layouts)
+
+    def generate_team_page(self):
+        return html.Div(id = "teamInfo", children = [])
 
 # The individual team Layout per team. This stores the data specific to the teams. Allows for better organization
 class TeamBoard(object):
@@ -313,7 +317,10 @@ class TeamBoard(object):
             player_names = self.player_names,
             player_position = self.player_position,
             player_scatter = self.player_scatter_dict,
-            owner = self.team.owner
+            owner = self.team.owner,
+            offensive_power = self.team.offensivePower,
+            defensive_power = self.team.defensivePower,
+            kicking_power = self.team.kicking_power
         )
         return temp
 
@@ -391,6 +398,8 @@ class TeamBoard(object):
             ]
         )
         self.team_layout = json.dumps(self.team_layout)
+
+
 
 
 

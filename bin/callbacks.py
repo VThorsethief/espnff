@@ -17,38 +17,50 @@ def update_league_summary(input_value):
     if input_value != "League Summary":
         return {'display': 'none'}
 
+@app.callback(
+    Output(component_id='teamInfo', component_property='style'),
+    [Input(component_id='dashSelector', component_property='value')]
+)
+def update_league_summary(input_value):
+    if input_value == "League Summary":
+        return {'display': 'none'}
+    else:
+        return
+
 #
 @app.callback(
-    Output(component_id='mainSub', component_property='children'),
+    Output(component_id='teamInfo', component_property='children'),
     [Input(component_id='dashSelector', component_property='value'),
      Input(component_id='teamData', component_property='children')]
-
 )
 def show_team_layout(input_value, team_data):
-    all_teams = dict(json.loads(team_data))
-    selected_team = json.loads(all_teams[input_value])
-    scatter_list = []
-    for player in selected_team['player_scatter']:
-        scatter_list.append(go.Scatter(
-            x = player['x'],
-            y = player['y'],
-            name = player['name'],
-            mode = player['mode']
-        ))
-    layout =  html.Div(
-        id = "teamPanel",
-        children=[
+    print(input_value)
+    if input_value != 'League Summary' and input_value != 'League Bubble':
+        all_teams = dict(json.loads(team_data))
+        selected_team = json.loads(all_teams[input_value])
+        scatter_list = []
+        for player in selected_team['player_scatter']:
+            scatter_list.append(go.Scatter(
+                x=selected_team['player_scatter'][player]['x'],
+                y=selected_team['player_scatter'][player]['y'],
+                name=selected_team['player_scatter'][player]['name'],
+                mode=selected_team['player_scatter'][player]['mode']
+            ))
+        layout = html.Div(
+            id="teamPanel",
+            children=[
                 html.H1(
-                    id = 'teamHeader',
-                    children = selected_team['owner'],
-                    className = 'twelve columns'
+                    id='teamHeader',
+                    children=selected_team['owner'],
+                    className='twelve columns',
+                    style = {'text-align': 'center', 'color': '#1f77b4', 'border-top-color': 'grey', 'border-top-style': 'ridge','padding-top': '20px', 'font-family': 'Impact'}
                 ),
                 html.Div(
                     children=[
                         html.Div(dcc.Graph(
                             id="teamLine",
                             figure=go.Figure(
-                                data =scatter_list,
+                                data=scatter_list,
                                 layout=go.Layout(
                                     title="Player Score Progress over time",
                                     yaxis=dict(title="Team Scores")
@@ -73,10 +85,10 @@ def show_team_layout(input_value, team_data):
                 html.Div(
                     children=[
                         dcc.Graph(
-                            id = "teamScatter",
-                            figure = go.Figure(
-                                data = [go.Scatter3d(
-                                    x = selected_team['player_position'],
+                            id="teamScatter",
+                            figure=go.Figure(
+                                data=[go.Scatter3d(
+                                    x=selected_team['player_position'],
                                     y=selected_team['player_total_points'],
                                     z=selected_team['player_week_points'],
                                     text=selected_team['player_names'],
@@ -94,7 +106,10 @@ def show_team_layout(input_value, team_data):
                                 layout=go.Layout(
                                     height=1000,
                                     width=1000,
-                                    title=selected_team['owner']
+                                    scene=dict(
+                                    yaxis=dict(title = "Player's Total Points"),
+                                    zaxis = dict(title = "Player's Week Points"),
+                                    xaxis = dict(title = "Player's Position"))
                                 )
                             )
                         )
@@ -103,10 +118,9 @@ def show_team_layout(input_value, team_data):
 
                 )
 
-
             ]
         )
-    return layout
+        return layout
 
 
 
